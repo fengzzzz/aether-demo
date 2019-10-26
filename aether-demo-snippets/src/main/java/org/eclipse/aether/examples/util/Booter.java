@@ -18,32 +18,32 @@ import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
 
 /**
  * A helper to boot the repository system and a repository system session.
  */
-public class Booter
-{
+public class Booter {
 
-    public static RepositorySystem newRepositorySystem()
-    {
+
+    public static RepositorySystem newRepositorySystem() {
         return org.eclipse.aether.examples.manual.ManualRepositorySystemFactory.newRepositorySystem();
         // return org.eclipse.aether.examples.guice.GuiceRepositorySystemFactory.newRepositorySystem();
         // return org.eclipse.aether.examples.sisu.SisuRepositorySystemFactory.newRepositorySystem();
         // return org.eclipse.aether.examples.plexus.PlexusRepositorySystemFactory.newRepositorySystem();
     }
 
-    public static DefaultRepositorySystemSession newRepositorySystemSession( RepositorySystem system )
-    {
+    public static DefaultRepositorySystemSession newRepositorySystemSession(RepositorySystem system) {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 
-        LocalRepository localRepo = new LocalRepository( "target/local-repo" );
-        session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
+        LocalRepository localRepo = new LocalRepository("target/local-repo");
+        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
 
-        session.setTransferListener( new ConsoleTransferListener() );
-        session.setRepositoryListener( new ConsoleRepositoryListener() );
+        session.setTransferListener(new ConsoleTransferListener());
+        session.setRepositoryListener(new ConsoleRepositoryListener());
 
         // uncomment to generate dirty trees
         // session.setDependencyGraphTransformer( null );
@@ -51,14 +51,14 @@ public class Booter
         return session;
     }
 
-    public static List<RemoteRepository> newRepositories( RepositorySystem system, RepositorySystemSession session )
-    {
-        return new ArrayList<RemoteRepository>( Arrays.asList( newCentralRepository() ) );
+    public static List<RemoteRepository> newRepositories(RepositorySystem system, RepositorySystemSession session) {
+        return new ArrayList<RemoteRepository>(Arrays.asList(newCentralRepository()));
     }
 
-    private static RemoteRepository newCentralRepository()
-    {
-        return new RemoteRepository.Builder( "central", "default", "http://central.maven.org/maven2/" ).build();
+    private static RemoteRepository newCentralRepository() {
+        Authentication authentication = new AuthenticationBuilder().addUsername("chenshengfeng").addPassword("Shanghai123$").build();
+//        return new RemoteRepository.Builder( "central", "default", "http://central.maven.org/maven2/" ).build();
+        return new RemoteRepository.Builder("central", "default", "http://nexus.51caocao.cn/content/groups/public").setAuthentication(authentication).build();
     }
 
 }

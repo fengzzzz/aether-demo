@@ -19,6 +19,9 @@ import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.examples.util.Booter;
 import org.eclipse.aether.examples.util.ConsoleDependencyGraphDumper;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.util.graph.visitor.PreorderNodeListGenerator;
 
 /**
  * Collects the transitive dependencies of an artifact.
@@ -36,15 +39,39 @@ public class GetDependencyTree
 
         RepositorySystemSession session = Booter.newRepositorySystemSession( system );
 
-        Artifact artifact = new DefaultArtifact( "org.apache.maven:maven-aether-provider:3.1.0" );
+        Artifact artifact = new DefaultArtifact( "com.caocao.billing:billing-api:1.9.9.0" );
 
+//        CollectRequest collectRequest = new CollectRequest();
+//        collectRequest.setRoot( new Dependency( artifact, "" ) );
+//        collectRequest.setRepositories( Booter.newRepositories( system, session ) );
+//
+//        CollectResult collectResult = system.collectDependencies( session, collectRequest );
+//
+//        collectResult.getRoot().accept( new ConsoleDependencyGraphDumper() );
         CollectRequest collectRequest = new CollectRequest();
+
+
         collectRequest.setRoot( new Dependency( artifact, "" ) );
+
         collectRequest.setRepositories( Booter.newRepositories( system, session ) );
 
-        CollectResult collectResult = system.collectDependencies( session, collectRequest );
+        DependencyNode node = system.collectDependencies(session, collectRequest).getRoot();
 
-        collectResult.getRoot().accept( new ConsoleDependencyGraphDumper() );
+        DependencyRequest dependencyRequest = new DependencyRequest();
+
+        dependencyRequest.setRoot(node);
+        system.resolveDependencies(session, dependencyRequest);
+
+        PreorderNodeListGenerator nlg = new PreorderNodeListGenerator();
+        node.accept(nlg);
+
+        System.out.println(nlg.getFiles());
+
+
+//       CollectResult collectResult = system.collectDependencies( session, collectRequest );
+
+//        collectResult.getRoot().accept( new ConsoleDependencyGraphDumper() );
+
     }
 
 }
